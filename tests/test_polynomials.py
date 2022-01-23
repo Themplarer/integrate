@@ -10,7 +10,7 @@ class TestPolynomials(unittest.TestCase):
         p = Polynomial([0])
         # да, обычно считается, что нулевой многочлен имеет степень -inf,
         # но нам это не нужно (и даже немного мешает)
-        self._assert_polynomials_equal(p, (0,), 0, '0')
+        self._assert_polynomials_equal(p, (0,), -1, '0')
 
     def test_constant(self):
         p = Polynomial([1])

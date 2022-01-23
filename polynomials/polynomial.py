@@ -67,7 +67,8 @@ class Polynomial:
 
             while o.power >= other.power:
                 div = Polynomial([0] * (o.power - other.power) +
-                                 [o.coeffs[-1] / other.coeffs[-1]])
+                                 [o.coeffs[-1] / other.coeffs[-1]],
+                                 self.variable)
                 res += div
                 o -= div * other
 
@@ -102,7 +103,7 @@ class Polynomial:
 
             return ''.join(strs)
 
-        if self.power == 0:
+        if self.power <= 0:
             return str(self.coeffs[0])
 
         strings = []
@@ -120,9 +121,20 @@ class Polynomial:
 
         return ''.join(strings)
 
+    def __bool__(self):
+        return any(self.coeffs)
+
+    def __hash__(self):
+        return hash(str(self))
+
     @property
     def power(self):
-        return len(self.coeffs) - 1
+        res = len(self.coeffs) - 1
+
+        if res:
+            return res
+
+        return 0 if self.coeffs[0] else -1
 
     def _add_signed(self, other, is_adding):
         verb = 'add' if is_adding else 'subtract'

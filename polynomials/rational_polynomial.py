@@ -51,6 +51,9 @@ class RationalPolynomial(Polynomial):
 
         return super().__eq__(other)
 
+    def __hash__(self):
+        return super().__hash__()
+
     def _add_signed(self, other, is_adding):
         if isinstance(other, int) or isinstance(other, Fraction):
             new_coeffs = list(self.coeffs)
