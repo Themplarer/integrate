@@ -3,10 +3,11 @@ class RationalFunction:
         if not denominator_poly:
             raise ZeroDivisionError('denominator must not be equal to 0')
 
+        self.denominator = denominator_poly
         self.poly_part, self.numerator = divmod(numerator_poly,
                                                 denominator_poly)
-        self.poly_part += poly_part
-        self.denominator = denominator_poly
+        if poly_part:
+            self.poly_part += poly_part
 
     def __add__(self, other):
         if isinstance(other, RationalFunction):
@@ -58,4 +59,8 @@ class RationalFunction:
             self.denominator * other)
 
     def __str__(self):
-        return f'{self.poly_part} + ({self.numerator})/({self.denominator})'
+        s = ''
+        if self.poly_part:
+            s = self.poly_part + ' + '
+
+        return s + f'({self.numerator})/({self.denominator})'

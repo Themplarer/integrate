@@ -1,6 +1,13 @@
 import itertools as it
+from decimal import Decimal
+from fractions import Fraction
 
-from rationalfunction import RationalFunction
+from rational_function import RationalFunction
+
+
+def is_number(number):
+    return isinstance(number, int) or isinstance(number, float) or \
+           isinstance(number, Decimal) or isinstance(number, Fraction)
 
 
 class Polynomial:
@@ -29,7 +36,7 @@ class Polynomial:
         return -self + other
 
     def __mul__(self, other):
-        if isinstance(other, int):
+        if is_number(other):
             return Polynomial([other * i for i in self.coeffs], self.variable)
 
         if isinstance(other, Polynomial):
@@ -40,7 +47,8 @@ class Polynomial:
             coeffs = list()
             for i in range(self.power + other.power + 1):
                 coeff = 0
-                for j in range(max(0, i - other.power), min(i, self.power) + 1):
+                for j in range(max(0, i - other.power),
+                               min(i, self.power) + 1):
                     coeff += self.coeffs[j] * other.coeffs[i - j]
 
                 coeffs.append(coeff)
@@ -55,6 +63,13 @@ class Polynomial:
             return RationalFunction(self, other)
 
         return Polynomial([i / other for i in self.coeffs], self.variable)
+
+    def __rtruediv__(self, other):
+        if is_number(other):
+            return RationalFunction(other, self)
+
+        raise ValueError('impossible to divide polynomial and '
+                         f'{type(other).__name__}!')
 
     def __divmod__(self, other):
         if isinstance(other, Polynomial):
@@ -73,6 +88,16 @@ class Polynomial:
                 o -= div * other
 
             return res, o
+
+        if is_number(other):
+            return self / other, Polynomial((0,), self.variable)
+
+        raise ValueError('impossible to divide polynomial and '
+                         f'{type(other).__name__}!')
+
+    def __rdivmod__(self, other):
+        if is_number(other):
+            return 0, other
 
         raise ValueError('impossible to divide polynomial and '
                          f'{type(other).__name__}!')

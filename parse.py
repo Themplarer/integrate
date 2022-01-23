@@ -15,7 +15,7 @@ def parse(poly, variable='x'):
                          f'{variable}')
 
     if variable not in all_letters:
-        return IntegerPolynomial([eval(poly)], variable)
+        return IntegerPolynomial((eval(poly),), variable)
 
     brackets_balance = 0
     for i in range(len(poly)):

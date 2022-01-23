@@ -1,40 +1,10 @@
 from fractions import Fraction
+from math import sqrt
 
+from function import Function
 from polynomials.polynomial import Polynomial
-from rationalfunction import RationalFunction
-
-
-class Function:
-    def __init__(self, terms):
-        self.terms = terms
-
-    def __str__(self):
-        strings = []
-        is_first = True
-        for i, j in self.terms.items():
-            if not j:
-                continue
-
-            if not is_first:
-                strings.append('+')
-
-            is_first = False
-            if j != 1:
-                n = str(j)
-                if j < 0:
-                    n = '(' + n + ')'
-
-                strings.append(n)
-
-            if j != 1:
-                strings.append('(')
-
-            strings.append(str(i))
-
-            if j != 1:
-                strings.append(')')
-
-        return ''.join(strings)
+from polynomials.rational_polynomial import RationalPolynomial
+from rational_function import RationalFunction
 
 
 def integrate_polynomial(p):
@@ -53,26 +23,42 @@ def integrate_rational_func(r):
         if r.denominator.power == 1:
             subfuncs[f'ln({r.denominator})'] = r.numerator / r.denominator[-1]
         elif r.denominator.power == 2:
-            e, d, c = r.denominator
-            num = r.numerator
-
-            if num.power == 1:
-                b, a = r.numerator
-
-                subfuncs[f'ln({r.denominator / c})'] = a / (2 * c)
-                num = Polynomial(((2 * b * c - a * d) / (2 * c),), num.variable)
-
-            if num.power == 0:
-                discriminant = d ** 2 - 4 * c * e
-                if discriminant == 0:
-                    subfuncs[f'1/({num.variable}+-[] nvb234byrdtfnki;"hkjly ' \
-                             f'qrwerty'] = a /\
-                                                                          (2 * c)
-
-
+            _integrate_and_add_res_denominator_second_pow(r, subfuncs)
         else:
             raise ValueError("polynomials' degrees are too high: can't "
                              "integrate")
 
     subfuncs['C'] = 1
     return Function(subfuncs)
+
+
+def _integrate_and_add_res_denominator_second_pow(r, subfuncs):
+    e, d, c = r.denominator.coeffs
+    num = r.numerator
+    v = r.numerator.variable
+
+    if num.power == 1:
+        b, a = num.coeffs
+
+        subfuncs[f'ln({r.denominator / c})'] = a / (2 * c)
+        num = Polynomial(((2 * b * c - a * d) / (2 * c),), v)
+
+    if num.power == 0:
+        discriminant = d ** 2 - 4 * c * e
+        if discriminant == 0:
+            root = Fraction(-d, (2 * c))
+            f = RationalFunction(1, RationalPolynomial((-root, 1), v))
+            subfuncs[f] = Fraction(num.coeffs[-1], c)
+        elif discriminant < 0:
+            x = 2 * c / (Fraction(sqrt(-discriminant)))
+            p = RationalPolynomial((d / 2, 1), v) * x
+            subfuncs[f'arctg({p})'] = x * num.coeffs[-1] / c
+        else:
+            x = Fraction(sqrt(discriminant))
+            root1, root2 = (-d - x) / (2 * c), (-d + x) / (2 * c)
+
+            f1 = 1 / RationalPolynomial((-root1, 1), v)
+            subfuncs[f'ln({f1})'] = Fraction(num.coeffs[-1], x)
+
+            f2 = 1 / RationalPolynomial((-root2, 1), v)
+            subfuncs[f'ln({f2})'] = -Fraction(num.coeffs[-1], x)
