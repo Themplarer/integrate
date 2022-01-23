@@ -1,5 +1,7 @@
 import itertools as it
 
+from rationalfunction import RationalFunction
+
 
 class Polynomial:
     """Описывает многочлен над некоторым полем со сложением и умножением"""
@@ -47,6 +49,12 @@ class Polynomial:
 
         raise ValueError('impossible to multiply polynomial and '
                          f'{type(other).__name__}!')
+
+    def __truediv__(self, other):
+        if isinstance(other, Polynomial):
+            return RationalFunction(self, other)
+
+        return Polynomial([i / other for i in self.coeffs], self.variable)
 
     def __divmod__(self, other):
         if isinstance(other, Polynomial):

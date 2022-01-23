@@ -38,14 +38,6 @@ class RationalPolynomial(Polynomial):
 
         return _convert_to_rational_pol(super().__mul__(other))
 
-    def __truediv__(self, other):
-        if isinstance(other, int) or isinstance(other, Fraction):
-            return RationalPolynomial([i / other for i in self.coeffs],
-                                      self.variable)
-
-        raise ValueError('impossible to divide polynomial by '
-                         f'{type(other).__name__}!')
-
     def __floordiv__(self, other):
         return self.__truediv__(other)
 
